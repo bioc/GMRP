@@ -1,0 +1,506 @@
+%\VignetteIndexEntry{Causal Effect Analysis of Risk Factors for Disease with the "GMRP" package}
+%\VignettePackage{GMRP}
+
+% To compile this document
+% library('cacheSweave');rm(list=ls());Sweave('GMRP.Rnw',driver=cacheSweaveDriver());system("pdflatex GMRP")
+
+\documentclass[a4paper]{article}
+
+\title{GWAS-based Mendelian Randomization Path Analysis}
+\author{Yuan-De Tan and Dajiang Liu\ \
+\texttt{tanyuande@gmail.com}}
+
+<<<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
+BiocStyle::latex()
+@ 
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\Rpackage{GMRP} can perform analyses of Mendelian randomization (\emph{MR}),correlation, path of causal variables onto disease of interest and \emph{SNP} annotation analysis. \emph{MR} includes \emph{SNP} selection with given criteria and regression analysis of causal variables on the disease to generate beta values of causal variables on the disease. Using the beta vectors, \Rpackage{GMRP} performs correlation and path analyses to construct  path diagrams of causal variables to the disease. \Rpackage{GMRP} consists of 8 $R$ functions: \Rfunction{chrp},\Rfunction{fmerg},\Rfunction{mktable},\Rfunction{pathdiagram},\Rfunction{pathdiagram2},\Rfunction{path},\Rfunction{snpposit},\Rfunction{ucscannot} and 5 datasets: \Robject{beta.data,cad.data,lpd.data,SNP358.data,SNP368annot.data}. \Rfunction{chrp} is used to separate string vector \texttt{hg19} into two numeric vectors: chromosome number and \emph{SNP} chromosome position. Function \Rfunction{fmerg} is used to merge two \emph{GWAS} result datasets into one dataset. Function \Rfunction{mktable} performs \emph{SNP} selection and creates a standard beta table for function \Rfunction{path} to do \emph{MR} and path analyses. Function \Rfunction{pathdiagram} is used to create a path diagram of causal variables onto the disease or onto outcome. Function \Rfunction{pathdiagram2} can merge two-level \emph{pathdiagrams} into one nested \emph{pathdiagram} where inner \emph{pathdiagram} is a \emph{pathdiagram} of causal variables contributing to outcome and the outside \emph{pathdiagram} is a path diagram of causal variables including outcome onto the disease. The five datasets provide examples for running these functions. \Robject{lpd.data} and \Robject{cad.data} provide an example to create a standard beta dataset for path function to do path analysis and \emph{SNP} data for \emph{SNP} annotation analysis by performing \Rfunction{mktable} and \Rfunction{fmerg}. \Robject{beta.data} are a standard beta dataset for path analysis. \Robject{SNP358.data} provide an example for \Rfunction{snpposit} to do \emph{SNP} position annotation analysis and \Robject{SNP368annot.data} are for \Rfunction{ucscannot} to do \emph{SNP} function annotation analysis.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+As an example of human disease, coronary artery disease (\emph{CAD}) is one of the causes leading to death and infirmity worldwide~\cite{Murray1997}. Low-density lipoprotein cholesterol (\emph{LDL}) and triglycerides (\emph{TG}) are viewed as risk factors causing \emph{CAD}.  In epidemiological studies, plasma concentrations of increasing \emph{TG} and \emph{LDL} and deceasing \emph{HDL} have been observed to be associated with risk for \emph{CAD}~\cite{Angelantonio2009, Sarwar2007}. However, from observational studies, one could not directly infer that these cholesterol concentrations  in plasma are risk factors causing \emph{CAD}~\cite{Do2013, Sarwar2007, Sheehan2007, Voight2012}. A big limitation of observational studies is to difficultly distinguish between causal and spurious associations due to confounding~\cite{Pichler2013}. An efficient approach to overcome this limitation is \textit{Mendelian Randomization} (\emph{MR}) analysis ~\cite{Sheehan2007, Smith2003} where genetic variants are used as instrumental variables. For this reason, many investigators tried to use genetic variants to assess causality and estimate the causal effects on the diseases.    
+
+\emph{MR} analysis can perfectly exclude confounding factors associated with disease.  However, when we expand one causal variable to many, \emph{MR} analysis becomes challenged and complicated because the genetic variant would have additional effects on the other risk factors, which violate assumption of no pleiotropy. An unknown genetic variant in \emph{MR} analysis possibly provides a false instrument for causal effect assessment of risk factors on the disease. The reason is that if this genetic variant is in \emph{LD} with another gene that is not used but has effect on the disease of study~\cite{Sheehan2007, Sheehan2010}. It then violates the third assumption.  These two problems can be addressed by using multiple instrumental variables.  For this reason, Do \emph{et al} (2013)developed statistic approach to address this issue~\cite{Do2013}. However, method of Do \emph{et al} ~\cite{Do2013} cannot disentangle correlation effects among the multiple undefined risk factors on the disease of study.  The beta values obtained from regression analyses are not direct causal effects because their effects are entangled with correlations among these undefined risk factors. 
+
+The best way to address the entanglement of multiple causal effects is path analysis that was developed by Wright~\cite{Wright1921, Wright1934}. This is because path analysis can dissect beta values into direct and indirect effects of causal variables on the disease. However, path analysis has not broadly been applied to diseases because diseases are usually binary variable. The method of Do ~\cite{Do2013} makes it possible to apply path analysis to disentangle causal effects of undefined risk factors on diseases. For doing so, we here provide \textbf {R package} \Rpackage{GMRP} (\emph{GWAS}-based \emph{MR} and \emph{path analysis}) to solve the above issues.
+
+This vignette is intended to give a rapid introduction to the commands used in implementing \emph{MR} analysis, regression analysis, and path analysis, including \emph{SNP} annotation and chromosomal position analysis by means of the \Rpackage{GMRP} package. 
+
+We assume that user has the \emph{GWAS} result data from \emph{GWAS} analysis or \emph{GWAS} meta analysis of \emph{SNP}s associated with risk or confounding factors and a disease of study. If all studied causal variables of \emph{GWAS} data are separately saved in different sheet files, then files are assumed to have the same sheet format and they are required to be merged by using function \Rfunction{fmerg} into one sheet file without disease \emph{GWAS} data. After a standard beta table is created with \Rfunction{mktable}, user can use function \Rfunction{path} to perform \emph{RM} and path analyses.  Using the result of path analysis, user can draw path \Rfunction{plot}\textit{(pathdiagram)} with functions \Rfunction{pathdiagram} and \Rfunction{pathdiagram2}. These will be introduced in detail in the following examples.
+
+We begin by loading the \Rpackage{GMRP} package.
+
+<<echo = false, results = hide>>=
+set.seed(102)
+options(width = 90)
+@
+
+<<>>=
+library(GMRP)
+@
+
+
+\section{Loading Data}
+\Rpackage{GMRP} provides five data files:   \Robject{beta.data}, \Robject{cad.data}, \Robject{lpd.data}, \Robject{SNP358.data} and \Robject{SNP368annot.data} where
+
+\Robject{lpd.data} was a subset (1069 SNPs) of four GWAS result datasets for \emph{LDL}, \emph{HDL}, \emph{TG} and \emph{TC}. These \emph{GWAS} result data sheets were downloaded from the website\footnote{\url{http://csg.sph.umich.edu//abecasis/public/lipids2013/} } where there are 120165 SNPs scattered on 23 chromosomes and 40 variables. Four GWAS result datasets for \emph{LDL}, \emph{HDL}, \emph{TG} and \emph{TC} were merged into one data sheet by using \Rfunction{fmerg}\textit{(fl1,fl2,ID1,ID2,A,B,method)} where \textit{fl1} and \textit{fl2} are two \emph{GWAS} result data sheets. $ID1$ and $ID2$ are key $id$ in files \textit{fl1} and \textit{fl2}, respectively, and required. $A$ and $B$ are postfix for \textit{fl1} and \textit{fl2}. Default values are $A$="" and $B$="". \textit{method} is method for merging . In the current version, there are four methods: \textit{method}="No" or "no" or "NO" or "N" or "n" means that  the data with unmatched \emph{SNP}s in \textit{file1} and \textit{file 2} are not saved in the merged file; \textit{method}="ALL" or "All" or "all" or "A" or "a" indicates that the data with all unmatched \emph{SNP}s in \textit{file 1} and \textit{file 2} are saved in the unpaired way in the merged data file; if \textit{method}="\textit{file1}", then those with unmatched \emph{SNP}s only from file1 are saved or if \textit{method}="\textit{file2}", \Rfunction{fmerg} will save the data with unmatched \emph{SNP}s only from \textit{file2}". Here is a simple example:
+
+<<fmerg,keep.source=TRUE, eval=FALSE>>=
+data1 <- matrix(NA, 20, 4)
+data2 <- matrix(NA, 30, 7)
+SNPID1 <- paste("rs", seq(1:20), sep="")
+SNPID2 <- paste("rs", seq(1:30), sep="")
+data1[,1:4] <- c(round(runif(20), 4), round(runif(20), 4), round(runif(20), 4), round(runif(20), 4))
+data2[,1:4] <- c(round(runif(30), 4),round(runif(30), 4), round(runif(30), 4), round(runif(30), 4))
+data2[,5:7] <- c(round(seq(30)*runif(30), 4), round(seq(30)*runif(30), 4), seq(30))
+data1 <- cbind(SNPID1, as.data.frame(data1))
+data2 <- cbind(SNPID2, as.data.frame(data2))
+dim(data1)
+dim(data2)
+colnames(data1) <- c("SNP", "var1", "var2", "var3", "var4")
+colnames(data2) <- c("SNP", "var1", "var2", "var3", "var4", "V1", "V2", "V3")
+data1<-DataFrame(data1)
+data2<-DataFrame(data2)
+data12 <- fmerg(fl1=data1, fl2=data2, ID1="SNP", ID2="SNP", A=".dat1", B=".dat2", method="No")
+@
+
+User can take the following approach to merge all four lipid files into a data sheet:
+\textit{LDL\underline{}HDL<-fmerg(fl1=LDL\underline{}file,fl2=HDL\underline{}file, ID1="SNP", ID2="SNP", A=".LDL", B=".HDL", method="No")}
+
+\textit{TG\underline{}TC<-fmerg(fl1=TG\underline{}file,fl2=TC\underline{}file, ID1="SNP", ID2="SNP", A=".TG", B=".TC", method="No")}
+
+\textit{lpd<-fmerg(fl1=LDL\underline{}HDL,fl2=TG\underline{}TC,ID1="SNP",ID2="SNP",A="",B="",method="No")}
+
+\Robject{cad.data} was also a subset (1069 SNPs) of original GWAS meta-analyzed dataset that was downloaded from the website\footnote{\url{http://www.cardiogramplusc4d.org/downloads/} } and contains 2420360 \emph{SNP}s and 12 variables. 
+
+\Robject{beta.data}  that was created by using function \Rfunction{mktable} and \Rfunction{fmerg} from \Robject{lpd.data} and \Robject{cad.data} is a standard beta table for \emph{MR} and path analyses.
+ 
+\Robject{SNP358.data} contains 358 \emph{SNP}s selected by \Rfunction{mktable} for \emph{SNP} position annotation analysis.
+
+\Robject{SNP368annot.data} is the data obtained from function analysis with \href{http://snp-nexus.org/index.html}{\emph{SNP} Annotation Tool} and provides example of performing function \Rfunction{ucscanno} to draw a \texttt{3D} pie and output the results of proportions of \emph{SNP}s coming from gene function various elements. 
+  
+ <<>>=
+data(cad.data)
+cad <- DataFrame(cad.data)
+head(cad)
+@
+
+<<>>=
+data(lpd.data)
+lpd <- DataFrame(lpd.data)
+head(lpd)
+@
+
+\section{Preparation of Standard Beta Table}
+The standard beta table for \emph{MR} and path analyses must have the standard format. It has columns: \textit{chrn}, \textit{posit}, \textit{rsid}, $a1.x_1$, $a1.x_2$, $\cdots$, $a1.x_n$, $freq.x_1$, $freq.x_2$, $\cdots$, $freq.x_n$, $beta.x_1$, $beta.x_2$, $\cdots$, $beta.x_n$,$sd.x_1$, $sd.x_2$, $\cdots$, $sd.x_n$, $pv_j$, $N.x_1$, $N.x_2$, $\cdots$, $N.x_n$, $pc_j$, $hg.d$, $SNP.d$, $freq.d$, $beta.d$, $N.d$, $freq.case$, $pd_j$ where $x_1$,$x_2$, $\cdots$, $x_n$ are variables.
+
+$beta$ is vector of beta values of \emph{SNP}s on variable vector $X$=($x_1$,$x_2$,$\cdots$,$x_n$).
+
+$freq$ is vector of frequency of allele 1 with respect to variable vector $X$=($x_1$,$x_2$,$\cdots$,$x_n$).
+
+$sd$ is vector of standard deviations of variable ($x_1$,$x_2$,$\cdots$,$x_n$) specific to \emph{SNP}. If $sd$ does not specifically correspond to \emph{SNP}, then $sd.x_i$ has the same value for all \emph{SNP}s.
+
+$d$ denotes disease.
+
+$N$ is sample size.
+
+$freq.case$ is frequency of disease.
+
+\textit{chrn} is vector of chromosome number.
+
+\textit{posit} is position vector of \emph{SNP}s on chromosomes. Some time, \textit{chrn} and posit are combined into string \textit{hg19} or \textit{hg18}.
+
+$pv_j$ is defined as \textit{p-value}, $pc_j$ and $pd_j$ as proportions of sample size for \emph{SNP} $j$ to the maximum sample size in causal variables and in disease, respectively.
+
+We use function \Rfunction{mktable} to choose \emph{SNP}s and make a standard beta table for \emph{MR} and path analyses.  For convenience, we first assign \Robject{lpd.data} to \Robject{lpd} and \Robject{cad.data} to \Robject{cad}:
+
+ 
+The standard beta table will be created via 15 steps:
+
+Step1: calculate $pvj$
+
+<<Step1,keep.source=TRUE, eval=FALSE>>=
+pvalue.LDL <- lpd$P.value.LDL
+pvalue.HDL <-lpd$P.value.HDL
+pvalue.TG <- lpd$P.value.TG
+pvalue.TC <- lpd$P.value.TC
+pv <- cbind(pvalue.LDL, pvalue.HDL, pvalue.TG, pvalue.TC)
+pvj <- apply(pv, 1, min)
+@
+
+Step2: retrieve causal variables from data \Robject{lpd} and construct a matrix for beta:
+<<Step2, keep.source=TRUE, eval=FALSE>>=
+beta.LDL <- lpd$beta.LDL
+beta.HDL <- lpd$beta.HDL
+beta.TG <- lpd$beta.TG
+beta.TC <- lpd$beta.TC
+beta <- cbind(beta.LDL, beta.HDL, beta.TG, beta.TC)
+@
+
+Step3: construct a matrix for allele1:
+<<Step3, keep.source=TRUE, eval=FALSE>>=
+a1.LDL <- lpd$A1.LDL
+a1.HDL <- lpd$A1.HDL
+a1.TG <- lpd$A1.TG
+a1.TC <- lpd$A1.TC
+alle1 <- cbind(a1.LDL, a1.HDL, a1.TG, a1.TC)
+@
+
+Step4: give sample sizes of causal variables and calculate $pcj$
+<<Step4, keep.source=TRUE, eval=FALSE>>=
+N.LDL <- lpd$N.LDL
+N.HDL <- lpd$N.HDL
+N.TG <- lpd$N.TG
+N.TC <- lpd$N.TC
+ss <- cbind(N.LDL, N.HDL, N.TG, N.TC)
+sm <- apply(ss,1,sum)
+pcj <- round(sm/max(sm), 6)
+@
+ 
+Step5: Construct matrix for frequency of \emph{allele1} in each causal variable in \emph{1000G.EUR}
+<<Step5, keep.source=TRUE, eval=FALSE>>=
+freq.LDL<-lpd$Freq.A1.1000G.EUR.LDL
+freq.HDL<-lpd$Freq.A1.1000G.EUR.HDL
+freq.TG<-lpd$Freq.A1.1000G.EUR.TG
+freq.TC<-lpd$Freq.A1.1000G.EUR.TC
+freq<-cbind(freq.LDL,freq.HDL,freq.TG,freq.TC)
+@
+ 
+Step6: construct matrix for $sd$ of each causal variable (here $sd$ is not specific to \emph{SNP} $j$). The following $sd$ values for \emph{LDL, HDL,TG} and \emph{TC} were means of standard deviations of these lipoprotein concentrations in plasma over 63 studies from Willer \emph{et al}~\cite{Willer2013}. 
+<<Step6, keep.source=TRUE, eval=FALSE>>=
+sd.LDL <- rep(37.42, length(pvj))
+sd.HDL <- rep(14.87, length(pvj))
+sd.TG <-rep(92.73, length(pvj))
+sd.TC <- rep(42.74, length(pvj))
+sd <- cbind(sd.LDL, sd.HDL, sd.TG, sd.TC)
+@
+
+Step7:  \emph{SNPID} and position:
+<<Step7, keep.source=TRUE, eval=FALSE>>=
+hg19 <- lpd$SNP_hg19.HDL
+rsid <- lpd$rsid.HDL
+@
+
+Step8: separate chromosome number and \emph{SNP} position using \Rfunction{chrp}:
+<<Step8, keep.source=TRUE, eval=FALSE>>=
+chr<-chrp(hg=hg19)
+@
+
+Step9: get new data:
+<<Step9, keep.source=TRUE, eval=FALSE>>=
+newdata<-cbind(freq,beta,sd,pvj,ss,pcj)
+newdata<-cbind(chr,rsid,alle1,as.data.frame(newdata))
+dim(newdata)
+@
+ 
+Step10: retrieve data from \Robject{cad} and calculate $pdj$ and frequency of coronary artery disease: \textit{freq.case} in population:
+<<Step10,keep.source=TRUE, eval=FALSE>>=
+hg18.d <- cad$chr_pos_b36
+SNP.d <- cad$SNP #SNPID
+a1.d<- tolower(cad$reference_allele)
+freq.d <- cad$ref_allele_frequency
+pvalue.d <- cad$pvalue
+beta.d <- cad$log_odds
+N.case <- cad$N_case
+N.ctr <- cad$N_control
+N.d <- N.case+N.ctr
+freq.case <- N.case/N.d
+@
+ 
+ Step11: combine these \texttt{cad} variables into new data sheet using \Rfunction{cbind}
+<<Step11, keep.source=TRUE, eval=FALSE>>=
+newcad <- cbind(freq.d, beta.d, N.case, N.ctr, freq.case)
+newcad <- cbind(hg18.d, SNP.d, a1.d, as.data.frame(newcad))
+dim(newcad)
+@
+ 
+Step12: give name vector of causal variables:
+<<Step12, eval=FALSE>>=
+varname <-c("CAD", "LDL", "HDL", "TG", "TC")
+@
+ 
+Step13: choose \emph{SNP}s using parameters $LG$, $Pv$, $Pc$ and $Pd$ and create \textbf{standard beta table} using \Rfunction{mktable}\textit{(cdata, ddata, rt,varname,LG, Pv, Pc,Pd)}where
+
+\textit{cdata} is beta data of SNPs regressed on causal variables. Here \textit{cdata}=\Robject{newdata}.
+
+\textit{ddata} is beta data of SNPs regressed on the disease (here \emph{CAD}). Here \textit{ddata}=\Robject{newcad}.
+
+$LG$: a numeric parameter. $LG$ is used to choose \emph{SNP}s with given interval threshold for linkage disequilibrium (\emph{LD}). Default $LG=10$.
+
+$Pv$:a numeric parameter. $Pv$ is used to choose \emph{SNP}s with a given $p$-value cutoff. Default $Pv=5\times 10^-8$.
+
+$Pc$: a numeric parameter. $Pc$ is used to choose \emph{SNP}s with a given cutoff for the proportion of sample size to maximum sample size in causal variable data. Default Pc=0.979.
+
+$Pd$: a numeric parameter. $Pd$ is used to choose \emph{SNP} with a given cutoff for the proportion of sample size to the maximum sample size in disease data. Default Pd =0.979. 
+
+\textit{rt} has two options: "beta" and "path". If \textit{rt}="beta" or "Beta" or "B", then \Rfunction{mktable} return a beta coefficient matrix of \emph{SNP}s regressed on causal variables and disease , if \textit{rt}="path" or "Path" or "P" it returns a path coefficient matrix of \emph{SNP}s directly contributing to causal variables and disease. 
+
+<<Step13, keep.source=TRUE, eval=FALSE>>=
+mybeta <- mktable(cdata=newdata, ddata=newcad, rt="beta", varname=varname, LG=1, Pv=0.00000005, Pc=0.979, Pd=0.979)
+dim(mybeta)
+beta <- mybeta[,4:8]   #  standard beta table for path analysis
+snp <- mybeta[,1:3]   #  snp data for annotation analysis
+beta<-DataFrame(beta)
+head(beta)
+@ 
+\section{Two-way Scatter Plots for Beta Values of Disease and Undefined Causal Variables}
+To roughly display relationship of the undefined causal variables to disease of study, we use simple \textbf{R} \Rfunction{plot} function to create two-way plots of beta of multiple \emph{SNP} regressed on the undefined causal variable versus the disease.  
+
+<<>>=
+data(beta.data)
+beta.data<-DataFrame(beta.data)
+CAD <- beta.data$cad
+LDL <- beta.data$ldl
+HDL <- beta.data$hdl
+TG <- beta.data$tg
+TC <- beta.data$tc
+@ 
+
+<<fig=FALSE,keep.source=TRUE, label=TwoScatterPlot>>=
+par(mfrow=c(2, 2), mar=c(5.1, 4.1, 4.1, 2.1), oma=c(0, 0, 0, 0))
+plot(LDL,CAD, pch=19, col="blue", xlab="beta of SNPs on LDL", ylab="beta of SNP on CAD", cex.lab=1.5, cex.axis=1.5, cex.main=2)
+abline(lm(CAD~LDL), col="red", lwd=2)
+plot(HDL, CAD, pch=19,col="blue", xlab="beta of SNPs on HDL", ylab="beta of SNP on CAD", cex.lab=1.5, cex.axis=1.5, cex.main=2)
+abline(lm(CAD~HDL), col="red", lwd=2)
+plot(TG, CAD, pch=19, col="blue", xlab="beta of SNPs on TG", ylab="beta of SNP on CAD",cex.lab=1.5, cex.axis=1.5, cex.main=2)
+abline(lm(CAD~TG), col="red", lwd=2)
+plot(TC,CAD, pch=19, col="blue", xlab="beta of SNPs on TC", ylab="beta of SNP on CAD", cex.lab=1.5, cex.axis=1.5, cex.main=2)
+abline(lm(CAD~TC), col="red", lwd=2)
+@
+
+\begin{figure}[ht]
+\begin{center}
+<<label=figTwoScatterPlot, fig=TRUE,echo=FALSE>>=
+<<TwoScatterPlot>>
+@ 
+\caption{Scatter plots of lipid versus coronary artery disease (CAD) based on beta values of 368 SNPs regression analyses}
+\label{figure1}
+\end{center}
+\end{figure}
+ 
+\section{MR and Path Analysis} 
+After \textbf{standard beta table} was successfully created by \Rfunction{mktable}, user can use function \Rfunction{path} to perform RM analysis (regression analysis of causal variable beta values on the disease or outcome beta values), correlation among the undefined causal variables and disease and path analyses with model of \[ y \sim x_1+x_2+\cdots+x_m\] where $y$ is disease or outcome variable, $x_i$ is undefined causal variable $i$. Path analysis is based on \emph{RM} analysis(regression coefficients of the causal beta  on the disease beta). \Rfunction{path} will produce three tables: beta coefficients, $sd$ values and $t$-test results of causal variables on disease or outcome, correlation matrix and path matrix(direct and indirect path coefficients)
+ 
+<<path, keep.source=TRUE, eval=FALSE>>=
+data(beta.data)
+mybeta <- DataFrame(beta.data)
+mod <- CAD~LDL+HDL+TG+TC
+pathvalue <- path(betav=mybeta, model=mod, outcome="CAD")
+@
+ 
+\section{Create Path Diagram}
+Once user finished performance of path, user will have  correlation matrix and direct path coefficients of undefined causal variable onto the disease. User is required to open a \textit{csv} file saving results of path analysis and make table in \textbf{R Console} or copy correlation matrix without disease correlation coefficients to \emph{excel} and copy direct path coefficients to the last column. Here is an example of making correlation and path table:
+<<>>=
+mypath <- matrix(NA,3,4)
+mypath[1,] <- c(1.000000, -0.066678, 0.420036, 0.764638)
+mypath[2,] <- c(-0.066678, 1.000000, -0.559718, 0.496831)
+mypath[3,] <- c(0.420036, -0.559718, 1.000000, 0.414346)
+colnames(mypath) <- c("LDL", "HDL", "TG", "path")
+mypath<-as.data.frame(mypath)
+mypath
+@
+
+The last column is direct path coefficients, we use "path" to name this column. With this table (for example, \Robject{mypath}), user can use function\Rfunction{pathdiagram}\textit{(pathdata,disease,R2,range)} to create path diagram. Here
+
+\textit{pathdata} is path result data consisting of causal correlation matrix and direct path coefficient vectors.
+
+\textit{disease} is  a string that specifies disease name. If the disease name is long or has multiple words, then we suggest an abbreviated name, for example, coronary artery disease are shorted as \emph{"CAD"}.
+
+$R2$, a numeric parameter, is $R$-square obtained from path analysis.
+
+\textit{range} is range of specified columns for correlation matrix. For example, \textit{range = c(2:4)} means the correlation coefficient begins with column 2 and end at column 4. For our current example, \textit{range=c(1:3)}. 
+
+<<>>=
+library(diagram)
+@
+
+<<fig=FALSE,keep.source=TRUE, label=PathDiagram>>=
+pathdiagram(pathdata=mypath, disease="CAD", R2=0.988243, range=c(1:3))
+@
+
+\begin{figure}[ht]
+\begin{center}
+<<label=figPathDiagram, fig=TRUE,echo=FALSE>>=
+<<PathDiagram>>
+@ 
+\caption{Path diagram demo. This path diagram shows the direct risk effects of causal variables \emph{LDL, HDL and TG} on the disease \emph{CAD} and their correlations.}
+\label{figure2}
+\end{center}
+\end{figure}
+
+\section{Create Two-level Nested Path Diagram}     
+Consider one of the causal variables is outcome of the other causal variables, but we also concern if all variables are risk factors for the disease of study. In this case we want to construct two-level nested path diagram using function \Rfunction{pathdiagram2}\textit{(pathD,pathO,rangeD,rangeO,disease,R2D,R2O)} where
+
+\textit{pathD} is a $R$ object that is disease path result data consisting of correlation matrix of undefined causal variables to be identified in Mendelian randomization analysis and path coefficient vector of these variables directly causing the disease of study.
+
+\textit{pathO} is a $R$ object that is outcome path result data consisting of correlation matrix of undefined causal variables and path coefficient vector of these variables directly contributing to outcome. This outcome variable may be one of risk factors or causal variables in disease path data. These variables in \textit{pathO} are the same with those in \textit{pathD}.
+
+\textit{rangeD} is numeric vector, specifies column range for correlation coefficient matrix  in \textit{pathD}, for example, \textit{rangeD=c(2:4)} means the correlation coefficient begins with column 2 and end at column 4.
+
+\textit{rangeO} is numeric vector, specifies column range for correlation coefficient matrix  in \textit{pathO}, see example in \textit{rangeD}.
+
+\textit{disease} is a string that specifies disease name. If the disease name is long or has multiple words, then we suggest an abbreviated name, for example, \emph{"coronary artery disease"} can be shortened as \emph{"CAD"}.
+
+Here is an example of \textit{pathD} data:
+
+<<>>=
+pathD<-matrix(NA,4,5)
+pathD[1,] <- c(1,	-0.070161, 0.399038, 0.907127, 1.210474)
+pathD[2,] <- c(-0.070161,	1, -0.552106, 0.212201, 0.147933)
+pathD[3,] <- c(0.399038, -0.552106, 1, 0.44100, 0.64229)
+pathD[4,] <- c(0.907127, 0.212201, 0.441007, 1, -1.035677)
+colnames(pathD) <- c("LDL", "HDL", "TG", "TC", "path")
+pathD<-as.data.frame(pathD)
+pathD
+@
+
+Using \Robject{pathD} and \Robject{mypath}, we can perform function \Rfunction{pathdiagram2} to create a two-level nested path diagram:
+
+<<fig=FALSE,keep.source=TRUE, label=PathDiagram2>>=
+pathdiagram2(pathD=pathD,pathO=mypath,rangeD=c(1:4),rangeO=c(1:3),disease="CAD", R2D=0.536535,R2O=0.988243)
+@ 
+
+\begin{figure}[ht]
+\begin{center}
+<<label=figPathDiagram2, fig=TRUE,echo=FALSE>>=
+<<PathDiagram2>>
+@ 
+\caption{Demo of two-level nested \textit{pathdiagram}. The outside \textit{pathdiagram} shows the direct risk effects of undefined causal variables \emph{LDL}, \emph{HDL}, \emph{TG} and \emph{TC} on the disease \emph{CAD}, the inner \textit{pathdiagram} indicates the direct contributions of \emph{LDL}, \emph{HDL} and \emph{TG} to \emph{TC} and the correlation relationships among these variables.}
+\label{figure3}
+\end{center}
+\end{figure}
+
+Note that in the current version, \Rpackage{GMRP} can just create two-level nested path diagram, maybe in the later version, \Rpackage{GMRP} will create more complex path diagrams such as more than one inner path diagram and\/or multiple-disease path diagram using structure equations.  
+
+\section{SNP Annotation Analysis}
+\emph{SNP}s chosen will be annotated in function and chromosome position. Position annotation analysis will give  position information of these selected \emph{SNP}s on chromosomes including chromosome distribution and averaged intervals between \emph{SNP}s. We use \Rfunction{snpposit} to perform \emph{SNP} position annotation. This package provides 358 \emph{SNP}s selected by \Rfunction{mktable}. 
+
+<<>>=
+data(SNP358.data)
+SNP358 <- DataFrame(SNP358.data)
+head(SNP358)
+@
+
+\Rfunction{head} displays data format required by \Rfunction{snpposit}. User can create similar table for \emph{SNP} position annotation analysis. To create chromosome position histogram, we need \Rpackage{graphics}:
+<<>>=
+library(graphics)
+@
+
+With SNP data \Robject{SNP358}, we can perform \emph{SNP} position annotation using function \Rfunction{snpposit}\textit{(SNPdata,SNP\underline{}hg19,LG,main,maxd)} where 
+
+\textit{SNPdata} is R object that may be \emph{hg19} that is a string vector(\textit{chr}\#\#.\#\#\#\#\#\#\#\#) or two numeric vectors (chromosome number and \emph{SNP} position).
+
+\textit{SNP\underline{}hg19} is a string parameter. It may be "\textit{hg19}" or "\textit{chr}". If \textit{SNP\underline{}hg19}="\textit{hg19}",then \textit{SNPdata} contains a string vector of \textit{hg19} or if \textit{SNP\underline{}hg19}="\textit{chr}", then \textit{SNPdata} consists of at lest two numeric columns: \textit{chr} and \textit{posit}. \textit{chr} is chromosome number and \textit{posit} is \emph{SNP} physical position on chromosomes. Note that "\textit{chr}" and "\textit{posit}" are required column names in \textit{SNPdata} if \textit{SNP\underline{}hg19} ="\textit{chr}".
+
+\emph{LG} is a numeric parameter that gives maximum permissible distance between positions. Its default is 10.
+
+\textit{main} is a string which is title of graph. If no title is given, then man="". Its default is "A".
+
+\textit{maxd} is a numeric parameter that is maximum distance for truncating chromosome columns. If there are not big differences among 23 chromosomes, then \textit{maxd} can be set to be larger than 2000$kbp$. Its default is  2000$kbp$.
+
+<<fig=FALSE,keep.source=TRUE, label=ChromHistogram>>=
+snpposit(SNPdata=SNP358,SNP_hg19="chr",LG=10,main="A",maxd=2000)
+@
+\begin{figure}[ht]
+\begin{center}
+<<label=figChromHistogram, fig=TRUE,echo=FALSE>>=
+<<ChromHistogram>>
+@ 
+\caption{ Chromosomal histogram of 358 selected \emph{SNP}s. Averaged lengths of \emph{SNP} intervals on chromosome mean that the \emph{SNP}s on a chromosome have their averaged lengths of intervals between them.  All averaged lengths over 2000kb on chromosomes were truncated, the \emph{SNP}s on these chromosomes have at least more than 2000$kbp$ averaged length of interval. Numbers above \textit{chr} columns are numbers of \emph{SNP} distributed on the chromosomes}
+\label{figure4}
+\end{center}
+\end{figure}
+
+SNP function annotation analysis has two steps:
+
+Step 1: copy \emph{SNP ID}s selected to \textbf{Batch Query} box in\href{http://snp-nexus.org/index.html}{\emph{SNP} Annotation Tool}. After setting parameters and running by clicking \emph{run button}, SNP annotation result will be obtained after running for a while. Choose consequence sheet of \emph{UCSC} and copy the results to excel sheet,"\emph{Predicted function}" column name is changed to "\emph{function\underline{}unit}" name and save it as \textit{csv} format. 
+
+Step2: input the \textit{csv} file into \emph{R Console} using \textbf{R} function \Rfunction{read.csv}. In \Rpackage{GMRP} package, we have provided data for \emph{SNP} function annotation analysis. 
+<<>>=
+data(SNP368annot.data)
+SNP368<-DataFrame(SNP368annot.data)
+SNP368[1:10, ]
+@
+
+We perform function \Rfunction{ucscannot} to summarize proportions of SNPs coming from gene various elements such as code region, introns, etc, and then create 3D pie with \Rfunction{pie3D} of \Rpackage{plotrix}. 
+<<>>=
+library(plotrix)
+@
+
+\Rfunction{ucscannot} has four parameters to be inputted: SNPn, A, B and C, a method and UCSC annotated data:
+
+\textit{UCSCannot} is annotation data obtained by performing SNP tools.
+
+\textit{SNPn} is numeric parameter for number of SNPs contained in \textit{UCSCannot}
+
+$A$ is numeric parameter for title size, default=2.5.
+
+$B$ is numeric parameter for label size, default=1.5.
+
+$C$ is numeric parameter for \emph{labelrad} distance,default=0.1.
+
+\textit{method} is numeric parameter for choosing figure output methods. It has two options: method=1 has no legend but color and pie components are labeled with gene elements, method=2 has legend over pie. The default = 1.	
+
+
+<<fig=FALSE,keep.source=TRUE, label=PIE3D1>>=
+ucscannot(UCSCannot=SNP368,SNPn=368)
+@
+\begin{figure}[ht]
+\begin{center}
+
+<<label=figPIE3D1, fig=TRUE,echo=FALSE>>=
+<<PIE3D1>>
+@  v
+\caption{ Distribution of the selected \emph{SNP}s  in gene function elements.}
+\label{figure5}
+\end{center}
+\end{figure}
+
+
+<<fig=FALSE,keep.source=TRUE, label=PIE3D2>>=
+ucscannot(UCSCannot=SNP368,SNPn=368,A=3,B=2,C=1.3,method=2)
+@
+\begin{figure}[ht]
+\begin{center}
+
+<<label=figPIE3D2, fig=TRUE,echo=FALSE>>=
+<<PIE3D2>>
+@ 
+\caption{ Distribution of the selected \emph{SNP}s  in gene function elements.}
+\label{figure6}
+\end{center}
+\end{figure}
+
+
+\clearpage
+
+\section{Session Info}
+
+<<>>=
+sessionInfo()
+@ 
+
+
+\begin{thebibliography}{99}
+\bibitem{Murray1997} Murray, C.J. and Lopez, A.D. (1997) \texttt{Global mortality, disability, and the contribution of risk factors: Global Burden of Disease Study.} \textsl{Lancet} \textbf{349}: 1436-1442.
+\bibitem{Angelantonio2009} Di Angelantonio, E., Sarwar, N., Perry, P., Kaptoge, S., Ray, K.K., Thompson, A., Wood, A.M., Lewington, S., Sattar, N., Packard, C.J. et al. (2009) \texttt{Major lipids, apolipoproteins, and risk of vascular disease.} \textsl{JAMA} \textbf{302}: 1993-2000.
+\bibitem{Sarwar2007} Sarwar, N., Danesh, J., Eiriksdottir, G., Sigurdsson, G., Wareham, N., Bingham, S., Boekholdt, S.M., Khaw, K.T., and Gudnason, V. (2007) \texttt{Triglycerides and the risk of coronary heart disease: 10,158 incident cases among 262,525 participants in 29 Western prospective studies.} \textsl{Circulation} \textbf{115}: 450-458.
+\bibitem{Do2013} Do, R., Willer, C.J., Schmidt, E.M., Sengupta, S., Gao, C., Peloso, G.M., Gustafsson, S., Kanoni, S., Ganna, A., Chen, J. et al. (2013) \texttt{Common variants associated with plasma triglycerides and risk for coronary artery disease.} \textsl{Nat Genet} \textbf{45}: 1345-1352.
+\bibitem{Sheehan2007} Sarwar, N., Danesh, J., Eiriksdottir, G., Sigurdsson, G., Wareham, N., Bingham, S., Boekholdt, S.M., Khaw, K.T., and Gudnason, V. (2007) \texttt{Triglycerides and the risk of coronary heart disease: 10,158 incident cases among 262,525 participants in 29 Western prospective studies.} \textsl{Circulation} \textbf{115}: 450-458
+\bibitem{Voight2012} Voight, B.F. Peloso, G.M. Orho-Melander, M. Frikke-Schmidt, R. Barbalic, M. Jensen, M.K. Hindy, G. Holm, H. Ding, E.L. Johnson, T. et al. (2012) \texttt{Plasma HDL cholesterol and risk of myocardial infarction: a mendelian randomisation study.} \textsl{Lancet} \textbf{380}: 572-580.
+\bibitem{Pichler2013} Pichler, I., Del Greco, M.F., Gogele, M., Lill, C.M., Bertram, L., Do, C.B., Eriksson, N., Foroud, T., Myers, R.H., Nalls, M. et al. (2013) \texttt{Serum iron levels and the risk of Parkinson disease: a Mendelian randomization study.} \textsl{PLoS Med} \textbf{10}: e1001462.
+\bibitem{Smith2003} Smith, G.D. and Ebrahim, S. (2003)  \texttt{'Mendelian randomization': can genetic epidemiology contribute to understanding environmental determinants of disease?} \textsl{Int J Epidemiol} \textbf{32}: 1-22.
+\bibitem{Sheehan2010} Sheehan, N.A., Meng, S., and Didelez, V. (2010) \textsl{Mendelian randomisation: a tool for assessing causality in observational epidemiology.} \textsl{Methods Mol Biol} \textbf{713}: 153-166.
+\bibitem{Willer2013} Willer, C.J. Schmidt, E.M. Sengupta, S. Peloso, G.M. Gustafsson, S. Kanoni, S. Ganna, A. Chen, J.,Buchkovich, M.L. Mora, S. et al (2013) \texttt{Discovery and refinement of loci associated with lipid levels.} \textsl{Nat Genet} \textbf{45}: 1274-1283.
+\bibitem{Wright1934} Wright, S. (1934) The method of path coefficients. \textsl{Annals of Mathematical Statistics} \textbf{5} (3): 161-215.
+\bibitem{Wright1921} Wright, S. 1921 Correlation and causation. \textsl{J.Agricultural Research} \textbf{20}: 557-585.
+\end{thebibliography}
+
+\end{document}
