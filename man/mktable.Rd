@@ -59,18 +59,16 @@ Return a standard \verb{SNP} beta or \verb{SNP} path table containing \code{m} \
 }
 \references{
 Do, R. et al. 2013. Common variants associated with plasma triglycerides and risk for coronary artery disease. \emph{Nat Genet} \bold{45}: 1345-1352.
-
-\\Sheehan, N.A. et al. 2008. Mendelian randomisation and causal inference in observational epidemiology. \emph{PLoS Med} \bold{5}: e177.
-
-\\Sheehan, N.A.,et al. 2010. Mendelian randomisation: a tool for assessing causality in observational epidemiology. \emph{Methods Mol Biol} \bold{713}: 153-166.
-
-\\Willer, C.J. Schmidt, E.M. Sengupta, S. Peloso, G.M. Gustafsson, S. Kanoni, S. Ganna, A. Chen, J.,Buchkovich, M.L. Mora, S. et al (2013) Discovery and refinement of loci associated with lipid levels. \emph{Nat Genet} \bold{45}: 1274-1283.
+\cr
+Sheehan, N.A. et al. 2008. Mendelian randomisation and causal inference in observational epidemiology. \emph{PLoS Med} \bold{5}: e177.
+\cr
+Sheehan, N.A.,et al. 2010. Mendelian randomisation: a tool for assessing causality in observational epidemiology. \emph{Methods Mol Biol} \bold{713}: 153-166.
+\cr
+Willer, C.J. Schmidt, E.M. Sengupta, S. Peloso, G.M. Gustafsson, S. Kanoni, S. Ganna, A. Chen, J.,Buchkovich, M.L. Mora, S. et al (2013) Discovery and refinement of loci associated with lipid levels. \emph{Nat Genet} \bold{45}: 1274-1283.
 }
 \author{
 Yuan-De Tan
 \email{tanyuande@gmail.com}
-
-\\Dajiang Liu
 }
 \note{
 The order of column variables must be \verb{chrn} \verb{posit} \verb{rsid} \code{a1.x1} \dots \code{a1.xn} \code{freq.x1} \dots \code{freq.xn} \code{beta.x1} \dots \code{beta.x1} \dots \code{beta.xn} \code{sd.x1} \dots \code{sd.xn} \dots otherwise, mktable would have error. see example.
@@ -81,10 +79,11 @@ The order of column variables must be \verb{chrn} \verb{posit} \verb{rsid} \code
 }
 \examples{
 data(lpd.data)
-lpd<-DataFrame(lpd.data)
+#lpd<-DataFrame(lpd.data)
+lpd<-lpd.data
 data(cad.data)
-cad<-DataFrame(cad.data)
-
+#cad<-DataFrame(cad.data)
+cad<-cad.data
 # step 1: calculate pvj
 pvalue.LDL<-lpd$P.value.LDL
 pvalue.HDL<-lpd$P.value.HDL

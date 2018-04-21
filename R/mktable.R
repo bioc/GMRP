@@ -29,7 +29,7 @@ pdj<-ND/max(ND)
 newcdat<-as.data.frame(newcdat)
 
 ddata<-cbind(ddata[idx,],pdj)
-newcd<-fmerg(fl1=newcdat,fl2=ddata,ID1="rsid",ID2="SNP.d",A="",B="",method="no")
+newcd<-fmerge(fl1=newcdat,fl2=ddata,ID1="rsid",ID2="SNP.d",A="",B="",method="no")
 sbnewdat<-subset(newcd,pdj>=Pd)
 sbnewdat<-as.data.frame(sbnewdat)
 

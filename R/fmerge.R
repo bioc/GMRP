@@ -1,4 +1,4 @@
-fmerg <-
+fmerge <-
 function(fl1,fl2,ID1,ID2,A="",B="",method="No"){
 
 try (if(is.null(dim(fl1))|is.null(dim(fl2))) 

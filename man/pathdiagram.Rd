@@ -33,8 +33,6 @@ NULL. pathdiagram will create one-level path diagram labeled with colors.
 \author{
 Yuan-De Tan
 \email{tanyuande@gmail.com}
-
-\\Dajiang Liu
 }
 
 \seealso{

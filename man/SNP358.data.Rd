@@ -17,7 +17,7 @@ Data of 358 SNPs
   }
 }
 \details{
-These 358 SNPs were chosen by using mktable with Pv = code{5x10e-08},\code{Pc = Pd =0.979} from code{lpd.data and cad.data}. They provide a data example for how to perform annotation analysis of SNP positions.
+These 358 SNPs were chosen by using mktable with Pv = \code{5x10e-08},\code{Pc = Pd =0.979} from \code{lpd.data and cad.data}. They provide a data example for how to perform annotation analysis of SNP positions.
 }
 \value{
 A set of data with 358 rows(SNPs) and 3 columns(SNP ID, chromosome # and SNP position on chromosomes).

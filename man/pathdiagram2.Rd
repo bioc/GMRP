@@ -42,7 +42,6 @@ Null. Function \emph{pathdiagram2} creates a nested two-level path diagram label
 Yuan-De Tan
 \email{tanyuande@gmail.com}
 
-\\Dajiang Liu
 }
 
 \seealso{

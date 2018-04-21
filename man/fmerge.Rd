@@ -1,5 +1,5 @@
-\name{fmerg}
-\alias{fmerg}
+\name{fmerge}
+\alias{fmerge}
 \title{
 Merge Two \bold{GWAS} Result Data Sheets
 }
@@ -7,7 +7,7 @@ Merge Two \bold{GWAS} Result Data Sheets
 \emph{fmerg} can be used to merge two \bold{GWAS} result data sheets with the same key \verb{ID(SNP ID)} into one data sheet.
 }
 \usage{
-fmerg(fl1, fl2,ID1, ID2, A, B, method)
+fmerge(fl1, fl2,ID1, ID2, A, B, method)
 }
 \arguments{
   \item{fl1}{
@@ -33,7 +33,8 @@ method for merging. See details.
 }
 }
 \details{
-fl1 and fl2 are two \bold{GWAS} result data files from different studies or with different risk variables. They contain \verb{SNPID}, \verb{hg18}, \verb{hg19}(positions), beta values, allele, frequency, and so on. The method has four options: method="No","NO" or "no" means that all data with unmatch \verb{SNP}s are not saved in the merged file; method="All","ALL" or "all" lets fmerg save all the data with unmatched \verb{SNP}s from two files but they are not paired one-by-one. This is different from R \emph{merge} function. method="file1" will save the data with unmatched \verb{SNP}s only from file 1 in the merged file and method="file2" allows function \emph{fmerg} to save the data with unmatched \verb{SNP}s from file2 in the merged file.
+fl1 and fl2 are two \bold{GWAS} result data files from different studies or with different risk variables. They contain \verb{SNPID}, \verb{hg18}, \verb{hg19}(positions), beta values, allele, frequency, and so on. The method has four options: method="No","NO" or "no" means that all data with unmatch \verb{SNP}s are not saved in the merged file; method="All","ALL" or "all" lets fmerge save all the data with unmatched \verb{SNP}s from two files but they are not paired one-by-one. This is
+different from R \emph{merge} function. method="file1" will save the data with unmatched \verb{SNP}s only from file 1 in the merged file and method="file2" allows function \emph{fmerge} to save the data with unmatched \verb{SNP}s from file2 in the merged file.
 
 }
 \value{
@@ -43,8 +44,6 @@ Return a joined data sheet.
 \author{
 Yuan-De Tan
 \email{tanyuande@gmail.com}
-
-\\Dajiang Liu
 }
 \note{
 Function fmerg can also be applied to the other types of data.
@@ -67,7 +66,7 @@ dim(data1)
 dim(data2)
 colnames(data1)<-c("SNP","var1","var2","var3","var4")
 colnames(data2)<-c("SNP","var1","var2","var3","var4","V1","V2","V3")
-data12<-fmerg(fl1=data1,fl2=data2,ID1="SNP",ID2="SNP",A=".dat1",B=".dat2",method="No")
+data12<-fmerge(fl1=data1,fl2=data2,ID1="SNP",ID2="SNP",A=".dat1",B=".dat2",method="No")
 #data12[1:3,]
 #  SNP.dat1 var1.dat1 var2.dat1 var3.dat1 var4.dat1 SNP.dat2 var1.dat2 var2.dat2
 #1      rs1    0.9152    0.9853    0.9879    0.9677      rs1    0.5041    0.5734

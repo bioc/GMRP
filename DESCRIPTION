@@ -1,9 +1,9 @@
 Package: GMRP
 Type: Package
 Title: GWAS-based Mendelian Randomization and Path Analyses
-Version: 1.7.1
-Date: 2015-11-04
-Author: Yuan-De Tan and Dajiang Liu
+Version: 1.7.2
+Date: 2018-04-15
+Author: Yuan-De Tan
 Maintainer: Yuan-De Tan <tanyuande@gmail.com>
 Description: Perform Mendelian randomization analysis of multiple SNPs
         to determine risk factors causing disease of study and to

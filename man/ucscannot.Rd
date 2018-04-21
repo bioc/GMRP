@@ -33,7 +33,6 @@ Create a color \emph{pie3D} diagram and return a set of numeric values: proporti
 Yuan-De Tan
 \email{tanyuande@gmail.com}
 
-\\Dajiang Liu
 }
 \note{
 This function just need  data of "Predicted function" and "symbol", so the other column data in UCSCannot do not impact the results of analysis.

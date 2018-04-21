@@ -7,7 +7,7 @@
 \documentclass[a4paper]{article}
 
 \title{GWAS-based Mendelian Randomization Path Analysis}
-\author{Yuan-De Tan and Dajiang Liu\ \
+\author{Yuan-De Tan \ \
 \texttt{tanyuande@gmail.com}}
 
 <<<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
@@ -19,13 +19,13 @@ BiocStyle::latex()
 \maketitle
 
 \begin{abstract}
-\Rpackage{GMRP} can perform analyses of Mendelian randomization (\emph{MR}),correlation, path of causal variables onto disease of interest and \emph{SNP} annotation analysis. \emph{MR} includes \emph{SNP} selection with given criteria and regression analysis of causal variables on the disease to generate beta values of causal variables on the disease. Using the beta vectors, \Rpackage{GMRP} performs correlation and path analyses to construct  path diagrams of causal variables to the disease. \Rpackage{GMRP} consists of 8 $R$ functions: \Rfunction{chrp},\Rfunction{fmerg},\Rfunction{mktable},\Rfunction{pathdiagram},\Rfunction{pathdiagram2},\Rfunction{path},\Rfunction{snpposit},\Rfunction{ucscannot} and 5 datasets: \Robject{beta.data,cad.data,lpd.data,SNP358.data,SNP368annot.data}. \Rfunction{chrp} is used to separate string vector \texttt{hg19} into two numeric vectors: chromosome number and \emph{SNP} chromosome position. Function \Rfunction{fmerg} is used to merge two \emph{GWAS} result datasets into one dataset. Function \Rfunction{mktable} performs \emph{SNP} selection and creates a standard beta table for function \Rfunction{path} to do \emph{MR} and path analyses. Function \Rfunction{pathdiagram} is used to create a path diagram of causal variables onto the disease or onto outcome. Function \Rfunction{pathdiagram2} can merge two-level \emph{pathdiagrams} into one nested \emph{pathdiagram} where inner \emph{pathdiagram} is a \emph{pathdiagram} of causal variables contributing to outcome and the outside \emph{pathdiagram} is a path diagram of causal variables including outcome onto the disease. The five datasets provide examples for running these functions. \Robject{lpd.data} and \Robject{cad.data} provide an example to create a standard beta dataset for path function to do path analysis and \emph{SNP} data for \emph{SNP} annotation analysis by performing \Rfunction{mktable} and \Rfunction{fmerg}. \Robject{beta.data} are a standard beta dataset for path analysis. \Robject{SNP358.data} provide an example for \Rfunction{snpposit} to do \emph{SNP} position annotation analysis and \Robject{SNP368annot.data} are for \Rfunction{ucscannot} to do \emph{SNP} function annotation analysis.
+\Rpackage{GMRP} can perform analyses of Mendelian randomization (\emph{MR}),correlation, path of causal variables onto disease of interest and \emph{SNP} annotation analysis. \emph{MR} includes \emph{SNP} selection with given criteria and regression analysis of causal variables on the disease to generate beta values of causal variables on the disease. Using the beta vectors, \Rpackage{GMRP} performs correlation and path analyses to construct  path diagrams of causal variables to the disease. \Rpackage{GMRP} consists of 8 $R$ functions: \Rfunction{chrp},\Rfunction{fmerge},\Rfunction{mktable},\Rfunction{pathdiagram},\Rfunction{pathdiagram2},\Rfunction{path},\Rfunction{snpPositAnnot},\Rfunction{ucscannot} and 5 datasets: \Robject{beta.data,cad.data,lpd.data,SNP358.data,SNP368annot.data}. \Rfunction{chrp} is used to separate string vector \texttt{hg19} into two numeric vectors: chromosome number and \emph{SNP} chromosome position. Function \Rfunction{fmerge} is used to merge two \emph{GWAS} result datasets into one dataset. Function \Rfunction{mktable} performs \emph{SNP} selection and creates a standard beta table for function \Rfunction{path} to do \emph{MR} and path analyses. Function \Rfunction{pathdiagram} is used to create a path diagram of causal variables onto a given disease or onto outcome. Function \Rfunction{pathdiagram2} can merge two-level \emph{pathdiagrams} into one nested \emph{pathdiagram} where inner \emph{pathdiagram} is a \emph{pathdiagram} of causal variables contributing to outcome and the outside \emph{pathdiagram} is a path diagram of causal variables including outcome onto the disease. The five datasets provide examples for running these functions. \Robject{lpd.data} and \Robject{cad.data} provide an example to create a standard beta dataset for path function to do path analysis and \emph{SNP} data for \emph{SNP} annotation analysis by performing \Rfunction{mktable} and \Rfunction{fmerge}. \Robject{beta.data} are a standard beta dataset for path analysis. \Robject{SNP358.data} provide an example for \Rfunction{snpPositAnnot} to do \emph{SNP} position annotation analysis and \Robject{SNP368annot.data} are for \Rfunction{ucscannot} to perform \emph{SNP} function annotation analysis.
 \end{abstract}
 
 \tableofcontents
 
 \section{Introduction}
-As an example of human disease, coronary artery disease (\emph{CAD}) is one of the causes leading to death and infirmity worldwide~\cite{Murray1997}. Low-density lipoprotein cholesterol (\emph{LDL}) and triglycerides (\emph{TG}) are viewed as risk factors causing \emph{CAD}.  In epidemiological studies, plasma concentrations of increasing \emph{TG} and \emph{LDL} and deceasing \emph{HDL} have been observed to be associated with risk for \emph{CAD}~\cite{Angelantonio2009, Sarwar2007}. However, from observational studies, one could not directly infer that these cholesterol concentrations  in plasma are risk factors causing \emph{CAD}~\cite{Do2013, Sarwar2007, Sheehan2007, Voight2012}. A big limitation of observational studies is to difficultly distinguish between causal and spurious associations due to confounding~\cite{Pichler2013}. An efficient approach to overcome this limitation is \textit{Mendelian Randomization} (\emph{MR}) analysis ~\cite{Sheehan2007, Smith2003} where genetic variants are used as instrumental variables. For this reason, many investigators tried to use genetic variants to assess causality and estimate the causal effects on the diseases.    
+As an example of human disease, coronary artery disease (\emph{CAD}) is one of the causes leading to death and infirmity worldwide~\cite{Murray1997}. Low-density lipoprotein cholesterol (\emph{LDL}) and triglycerides (\emph{TG}) are viewed as risk factors causing \emph{CAD}.  In epidemiological studies, plasma concentrations of increasing \emph{TG} and \emph{LDL} and deceasing high-density lipoprotein cholesterol (\emph{HDL} ) have been observed to be associated with risk for \emph{CAD}~\cite{Angelantonio2009, Sarwar2007}. However, from observational studies, one could not directly infer that these cholesterol concentrations  in plasma are risk factors causing \emph{CAD}~\cite{Do2013, Sarwar2007, Sheehan2007, Voight2012}. A big limitation of observational studies is to difficultly distinguish between causal and spurious associations due to confounding~\cite{Pichler2013}. An efficient approach to overcome this limitation is \textit{Mendelian Randomization} (\emph{MR}) analysis ~\cite{Sheehan2007, Smith2003} where genetic variants are used as instrumental variables. For this reason, many investigators tried to use genetic variants to assess causality and estimate the causal effects on the diseases.    
 
 \emph{MR} analysis can perfectly exclude confounding factors associated with disease.  However, when we expand one causal variable to many, \emph{MR} analysis becomes challenged and complicated because the genetic variant would have additional effects on the other risk factors, which violate assumption of no pleiotropy. An unknown genetic variant in \emph{MR} analysis possibly provides a false instrument for causal effect assessment of risk factors on the disease. The reason is that if this genetic variant is in \emph{LD} with another gene that is not used but has effect on the disease of study~\cite{Sheehan2007, Sheehan2010}. It then violates the third assumption.  These two problems can be addressed by using multiple instrumental variables.  For this reason, Do \emph{et al} (2013)developed statistic approach to address this issue~\cite{Do2013}. However, method of Do \emph{et al} ~\cite{Do2013} cannot disentangle correlation effects among the multiple undefined risk factors on the disease of study.  The beta values obtained from regression analyses are not direct causal effects because their effects are entangled with correlations among these undefined risk factors. 
 
@@ -52,7 +52,7 @@ library(GMRP)
 
 \Robject{lpd.data} was a subset (1069 SNPs) of four GWAS result datasets for \emph{LDL}, \emph{HDL}, \emph{TG} and \emph{TC}. These \emph{GWAS} result data sheets were downloaded from the website\footnote{\url{http://csg.sph.umich.edu//abecasis/public/lipids2013/} } where there are 120165 SNPs scattered on 23 chromosomes and 40 variables. Four GWAS result datasets for \emph{LDL}, \emph{HDL}, \emph{TG} and \emph{TC} were merged into one data sheet by using \Rfunction{fmerg}\textit{(fl1,fl2,ID1,ID2,A,B,method)} where \textit{fl1} and \textit{fl2} are two \emph{GWAS} result data sheets. $ID1$ and $ID2$ are key $id$ in files \textit{fl1} and \textit{fl2}, respectively, and required. $A$ and $B$ are postfix for \textit{fl1} and \textit{fl2}. Default values are $A$="" and $B$="". \textit{method} is method for merging . In the current version, there are four methods: \textit{method}="No" or "no" or "NO" or "N" or "n" means that  the data with unmatched \emph{SNP}s in \textit{file1} and \textit{file 2} are not saved in the merged file; \textit{method}="ALL" or "All" or "all" or "A" or "a" indicates that the data with all unmatched \emph{SNP}s in \textit{file 1} and \textit{file 2} are saved in the unpaired way in the merged data file; if \textit{method}="\textit{file1}", then those with unmatched \emph{SNP}s only from file1 are saved or if \textit{method}="\textit{file2}", \Rfunction{fmerg} will save the data with unmatched \emph{SNP}s only from \textit{file2}". Here is a simple example:
 
-<<fmerg,keep.source=TRUE, eval=FALSE>>=
+<<fmerge,keep.source=TRUE, eval=FALSE>>=
 data1 <- matrix(NA, 20, 4)
 data2 <- matrix(NA, 30, 7)
 SNPID1 <- paste("rs", seq(1:20), sep="")
@@ -68,15 +68,15 @@ colnames(data1) <- c("SNP", "var1", "var2", "var3", "var4")
 colnames(data2) <- c("SNP", "var1", "var2", "var3", "var4", "V1", "V2", "V3")
 data1<-DataFrame(data1)
 data2<-DataFrame(data2)
-data12 <- fmerg(fl1=data1, fl2=data2, ID1="SNP", ID2="SNP", A=".dat1", B=".dat2", method="No")
+data12 <- fmerge(fl1=data1, fl2=data2, ID1="SNP", ID2="SNP", A=".dat1", B=".dat2", method="No")
 @
 
 User can take the following approach to merge all four lipid files into a data sheet:
-\textit{LDL\underline{}HDL<-fmerg(fl1=LDL\underline{}file,fl2=HDL\underline{}file, ID1="SNP", ID2="SNP", A=".LDL", B=".HDL", method="No")}
+\textit{LDL\underline{}HDL<-fmerge(fl1=LDL\underline{}file,fl2=HDL\underline{}file, ID1="SNP", ID2="SNP", A=".LDL", B=".HDL", method="No")}
 
-\textit{TG\underline{}TC<-fmerg(fl1=TG\underline{}file,fl2=TC\underline{}file, ID1="SNP", ID2="SNP", A=".TG", B=".TC", method="No")}
+\textit{TG\underline{}TC<-fmerge(fl1=TG\underline{}file,fl2=TC\underline{}file, ID1="SNP", ID2="SNP", A=".TG", B=".TC", method="No")}
 
-\textit{lpd<-fmerg(fl1=LDL\underline{}HDL,fl2=TG\underline{}TC,ID1="SNP",ID2="SNP",A="",B="",method="No")}
+\textit{lpd<-fmerge(fl1=LDL\underline{}HDL,fl2=TG\underline{}TC,ID1="SNP",ID2="SNP",A="",B="",method="No")}
 
 \Robject{cad.data} was also a subset (1069 SNPs) of original GWAS meta-analyzed dataset that was downloaded from the website\footnote{\url{http://www.cardiogramplusc4d.org/downloads/} } and contains 2420360 \emph{SNP}s and 12 variables. 
 
@@ -86,15 +86,17 @@ User can take the following approach to merge all four lipid files into a data s
 
 \Robject{SNP368annot.data} is the data obtained from function analysis with \href{http://snp-nexus.org/index.html}{\emph{SNP} Annotation Tool} and provides example of performing function \Rfunction{ucscanno} to draw a \texttt{3D} pie and output the results of proportions of \emph{SNP}s coming from gene function various elements. 
   
- <<>>=
+<<>>=
 data(cad.data)
-cad <- DataFrame(cad.data)
+#cad <- DataFrame(cad.data)
+cad<-cad.data
 head(cad)
 @
 
 <<>>=
 data(lpd.data)
-lpd <- DataFrame(lpd.data)
+#lpd <- DataFrame(lpd.data)
+lpd<-lpd.data
 head(lpd)
 @
 
@@ -406,7 +408,7 @@ With SNP data \Robject{SNP358}, we can perform \emph{SNP} position annotation us
 \textit{maxd} is a numeric parameter that is maximum distance for truncating chromosome columns. If there are not big differences among 23 chromosomes, then \textit{maxd} can be set to be larger than 2000$kbp$. Its default is  2000$kbp$.
 
 <<fig=FALSE,keep.source=TRUE, label=ChromHistogram>>=
-snpposit(SNPdata=SNP358,SNP_hg19="chr",LG=10,main="A",maxd=2000)
+snpPositAnnot(SNPdata=SNP358,SNP_hg19="chr",main="A")
 @
 \begin{figure}[ht]
 \begin{center}
@@ -457,7 +459,7 @@ ucscannot(UCSCannot=SNP368,SNPn=368)
 
 <<label=figPIE3D1, fig=TRUE,echo=FALSE>>=
 <<PIE3D1>>
-@  v
+@  
 \caption{ Distribution of the selected \emph{SNP}s  in gene function elements.}
 \label{figure5}
 \end{center}

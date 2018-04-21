@@ -29,20 +29,18 @@ Return three matrices: beta coefficients of regressions of risk variables on out
 }
 \references{
 Do, R. et al. 2013 Common variants associated with plasma triglycerides and risk for coronary artery disease. \emph{Nat Genet} \bold{45}: 1345-1352.
-
-\\Sheehan, N.A. et al. 2008 Mendelian randomisation and causal inference in observational epidemiology. PLoS Med 5: e177.
-
-\\Sheehan, N.A.,et al. 2010 Mendelian randomisation: a tool for assessing causality in observational epidemiology. \emph{Methods Mol Biol} \bold{713}: 153-166.
-
-\\Wright, S. 1921 Correlation and causation. \emph{J.Agricultural Research} \bold{20}: 557-585.
-
-\\Wright, S. 1934 The method of path coefficients. \emph{Annals of Mathematical Statistics} \bold{5} (3): 161-215.
+\cr
+Sheehan, N.A. et al. 2008 Mendelian randomisation and causal inference in observational epidemiology. PLoS Med 5: e177.
+\cr
+Sheehan, N.A.,et al. 2010 Mendelian randomisation: a tool for assessing causality in observational epidemiology. \emph{Methods Mol Biol} \bold{713}: 153-166.
+\cr
+Wright, S. 1921 Correlation and causation. \emph{J.Agricultural Research} \bold{20}: 557-585.
+\cr
+Wright, S. 1934 The method of path coefficients. \emph{Annals of Mathematical Statistics} \bold{5} (3): 161-215.
 }
 \author{
 Yuan-De Tan
 \email{tanyuande@gmail.com}
-
-\\Dajiang Liu
 }
 \note{
 betav may also be a matrix of SNP path coefficients onto risk variables and disease.

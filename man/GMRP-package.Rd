@@ -9,25 +9,26 @@
 \bold{GMRP} is used to perform Mendelian randomization analysis of causal variables on disease of study using SNP beta data from \bold{GWAS} or \bold{GWAS} meta analysis and furthermore execute path analysis of causal variables onto the disease.
 }
 \details{
-\bold{GMRP} can perform analyses of Mendelian randomization (MR),correlation, path of causal variables onto disease of interest and SNP annotation summarization analysis. MR includes SNP selection with given criteria and regression analysis of causal variables on the disease to generate beta values of causal variables on the disease. Using the beta values, \bold{GMRP} performs correlation and path analyses to construct  path diagrams of causal variables to the disease. \bold{GMRP} consists of 8 functions: \emph{chrp, fmerg, mktable,  pathdiagram2, pathdiagram, path, snpposit, ucscannot} and 5 datasets: \code{beta.data, cad.data, lpd.data, SNP358.data and SNP368_annot.data}. Function \emph{chrp} is used to separate string vector hg19 into two numeric vectors: chromosome number and SNP position on chromosomes. Function \emph{fmerg} is used to merge two datasets into one dataset. Function \emph{mktable} performs SNP selection and creates a standard beta table for function path to do path analyses. Function \emph{pathdiagram} is used to create a path diagram of causal variables onto the disease or onto outcome. Function \emph{pathdiagram2} can merg two-level pathdiagrams into one nested pathdiagram where inner path diagram is a path diagram of causal variables contributing onto outcome and the outside path diagram is a diagram of path of causal variables including outcome onto the disease. The five datasets provide examples for running these functions. \code{lpd.data} and \code{cad.data} provide an example to create a standard beta dataset for \emph{path} function to do path analysis and SNP data for SNP annotation analysis by performing \emph{mktable} and \emph{fmerg}. beta.data are a standard beta dataset for path analysis. \code{SNP358.data} provide an example for function \emph{snpposit} to do SNP position annotation analysis and \code{SNP368_annot.data} are for function \emph{ucscannot} to do SNP function annotation analysis. It is specially emphasized that except for that making standard beta table using \emph{mktable} must be done in Unix/Linux system,GMRP can be performed in Windows or Mac OS. This is because GWAS datasets usually are very huge but standard beta table is small. If users'Unix/Linux system has X11 or the other graphics system, then user should perform GMRP in Unix/Linux system, otherwise, user should transfer a standard beta table to a local computer and run GMRP in it.      
+\bold{GMRP} can perform analyses of Mendelian randomization (MR),correlation, path of causal variables onto disease of interest and SNP annotation summarization analysis. MR includes SNP selection with given criteria and regression analysis of causal variables on the disease to generate beta values of causal variables on the disease. Using the beta values, \bold{GMRP} performs correlation and path analyses to construct  path diagrams of causal variables to the disease. \bold{GMRP} consists
+of 8 functions: \emph{chrp, fmerge, mktable,  pathdiagram2, pathdiagram, path, snpPositAnnot, ucscannot} and 5 datasets: \code{beta.data, cad.data, lpd.data, SNP358.data and SNP368_annot.data}. Function \emph{chrp} is used to separate string vector hg19 into two numeric vectors: chromosome number and SNP position on chromosomes. Function \emph{fmerge} is used to merge two datasets into one dataset. Function \emph{mktable} performs SNP selection and creates a standard beta table for
+function path to do path analyses. Function \emph{pathdiagram} is used to create a path diagram of causal variables onto the disease or onto outcome. Function \emph{pathdiagram2} can merge two-level pathdiagrams into one nested pathdiagram where inner path diagram is a path diagram of causal variables contributing onto outcome and the outside path diagram is a diagram of path of causal variables including outcome onto the disease. The five datasets provide examples for running these
+functions. \code{lpd.data} and \code{cad.data} provide an example to create a standard beta dataset for \emph{path} function to do path analysis and SNP data for SNP annotation analysis by performing \emph{mktable} and \emph{fmerge}. beta.data are a standard beta dataset for path analysis. \code{SNP358.data} provide an example for function \emph{snpPositAnnot} to do SNP position annotation analysis and \code{SNP368_annot.data} are for function \emph{ucscannot} to do SNP function annotation analysis. It is specially emphasized that except for that making standard beta table using \emph{mktable} must be done in Unix/Linux system,GMRP can be performed in Windows or Mac OS. This is because GWAS datasets usually are very huge but standard beta table is small. If users'Unix/Linux system has X11 or the other graphics system, then user should perform GMRP in Unix/Linux system, otherwise, user should transfer a standard beta table to a local computer and run GMRP in it.      
 
 }
 \author{
 Yuan-De Tan
 \email{tanyuande@gmail.com}
-
-\\Dajiang Liu
-
-\\Maintainer: Yuan-De Tan
+\cr
+Maintainer: Yuan-De Tan
 }
 \references{
 Do, R. et al. 2013. Common variants associated with plasma triglycerides and risk for coronary artery disease. Nat Genet 45: 1345-1352.
-
-\\Sheehan, N.A. et al. 2008. Mendelian randomisation and causal inference in observational epidemiology. PLoS Med 5: e177.
- 
-\\Sheehan, N.A.,et al. 2010. Mendelian randomisation: a tool for assessing causality in observational epidemiology. Methods Mol Biol 713: 153-166.\\Wright, S. 1921. Correlation and causation. J. Agricultural Research 20: 557-585.
-
-\\Wright, S. 1934. The method of path coefficients Annals of Mathematical Statistics 5 (3): 161-215 5: 161-215.
+\cr
+Sheehan, N.A. et al. 2008. Mendelian randomisation and causal inference in observational epidemiology. PLoS Med 5: e177.
+\cr 
+Sheehan, N.A.,et al. 2010. Mendelian randomisation: a tool for assessing causality in observational epidemiology. Methods Mol Biol 713: 153-166.\\Wright, S. 1921. Correlation and causation. J. Agricultural Research 20: 557-585.
+\cr
+Wright, S. 1934. The method of path coefficients Annals of Mathematical Statistics 5 (3): 161-215 5: 161-215.
 
 }
 \keyword{ package }
