@@ -40,13 +40,18 @@ stop("No Symbol found in the data")
  annot<-c("exon","intron","intergene","5'UTR","5'upstream","3'UTR","3'downstream")
  lbls <- paste(annot, "\n", round(res2*100,1),"%", sep="")
 # oldcexmain<-par(cex.main=A)
- pie3D(res2,labelcex=B,labels=lbls,labelcol=par("fg"), explode=0.1,labelrad=C,main=main)
- }else if(method==2){
-  annot<-c("intron","exon","3'downstream","3'UTR","5'upstream","5'UTR","intergene")
-  lbls <- paste(round(res2*100,1),"%", sep="")		
- # cols=c("gold2","red","magenta","blue","cornflowerblue","limegreen","mediumseagreen")
- pie3D(res2,labelcex=(B+0.5),labels=lbls,labelcol=par("fg"), explode=0.08,labelrad=C,main=main)
- if (B>=1.8){
+bisectors<-pie3D(res2,explode=0.1,main=main)
+ pie3D.labels(radialpos=bisectors,radius=1,height=0.1,theta=pi/6,
+       labels=lbls,labelcol=par("fg"),labelcex=B,labelrad=C,minsep=0.3)
+  }else if(method==2){
+        annot<-c("intron","exon","3'downstream","3'UTR","5'upstream","5'UTR","intergene")
+          lbls <- paste(round(res2*100,1),"%", sep="")      
+           # cols=c("gold2","red","magenta","blue","cornflowerblue","limegreen","mediumseagreen")
+            bisectors<-pie3D(res2,explode=0.08,main=main)
+            pie3D.labels(radialpos=bisectors,radius=1,height=0.1,theta=pi/6,
+                  labels=lbls,labelcol=par("fg"),labelcex=(B+0.5),labelrad=C,minsep=0.3) 
+
+if (B>=1.8){
  D<-1.8
  }else{
  D<-B}

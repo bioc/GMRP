@@ -12,7 +12,7 @@ Description: Perform Mendelian randomization analysis of multiple SNPs
 License: GPL (>= 2)
 Depends: R(>= 3.3.0),stats,utils,graphics, grDevices, diagram, plotrix,
         base,GenomicRanges
-Suggests: BiocStyle, BiocGenerics, VariantAnnotation
+Suggests: BiocStyle, BiocGenerics
 LazyLoad: yes
 biocViews: Sequencing, Regression, SNP
 NeedsCompilation: no

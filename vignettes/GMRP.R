@@ -3,9 +3,10 @@
 ###################################################
 ### code chunk number 1: <style-Sweave
 ###################################################
-BiocStyle::latex()
+#BiocStyle::latex()
+BiocStyle::latex(use.unsrturl=FALSE)
 
-#library("knitr")
+#library(knitr)
 #opts_chunk$set(tidy=FALSE,dev="pdf",fig.show="hide",
  #              fig.width=4,fig.height=4.5,
   #             dpi=300,# increase dpi to avoid pixelised pngs
