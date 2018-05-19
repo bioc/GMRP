@@ -20,13 +20,13 @@ stop("No Symbol found in the data")
  upstream5<-subset(UCSCannot,function_unit=="5upstream")
  downstream3<-subset(UCSCannot,function_unit=="3downstream")
 
- intron<-length(intron[,1])/N
- coding<-length(code[,1])/N
- UTR3<-length(UTR3[,1])/N
- UTR5<-length(UTR5[,1])/N
- intergene<-length(ncoding[,1])/N
- upstream<-length(upstream5[,1])/N
- downstream<-length(downstream3[,1])/N
+ intron<-nrow(intron)/N
+ coding<-nrow(code)/N
+ UTR3<-nrow(UTR3)/N
+ UTR5<-nrow(UTR5)/N
+ intergene<-nrow(ncoding)/N
+ upstream<-nrow(upstream5)/N
+ downstream<-nrow(downstream3)/N
 
  res<-matrix(NA,1,8)
  res[1,]<-c(gene.n,coding,intron,UTR3,UTR5,intergene,upstream,downstream)

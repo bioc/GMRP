@@ -7,7 +7,7 @@
 \documentclass[a4paper]{article}
 
 \title{GWAS-based Mendelian Randomization Path Analysis}
-\author{Yuan-De Tan \ \
+\author{Yuan-De Tan \\
 \texttt{tanyuande@gmail.com}}
 
 <<<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
@@ -19,7 +19,7 @@ BiocStyle::latex()
 \maketitle
 
 \begin{abstract}
-\Rpackage{GMRP} can perform analyses of Mendelian randomization (\emph{MR}),correlation, path of causal variables onto disease of interest and \emph{SNP} annotation analysis. \emph{MR} includes \emph{SNP} selection with given criteria and regression analysis of causal variables on the disease to generate beta values of causal variables on the disease. Using the beta vectors, \Rpackage{GMRP} performs correlation and path analyses to construct  path diagrams of causal variables to the disease. \Rpackage{GMRP} consists of 8 $R$ functions: \Rfunction{chrp},\Rfunction{fmerge},\Rfunction{mktable},\Rfunction{pathdiagram},\Rfunction{pathdiagram2},\Rfunction{path},\Rfunction{snpPositAnnot},\Rfunction{ucscannot} and 5 datasets: \Robject{beta.data,cad.data,lpd.data,SNP358.data,SNP368annot.data}. \Rfunction{chrp} is used to separate string vector \texttt{hg19} into two numeric vectors: chromosome number and \emph{SNP} chromosome position. Function \Rfunction{fmerge} is used to merge two \emph{GWAS} result datasets into one dataset. Function \Rfunction{mktable} performs \emph{SNP} selection and creates a standard beta table for function \Rfunction{path} to do \emph{MR} and path analyses. Function \Rfunction{pathdiagram} is used to create a path diagram of causal variables onto a given disease or onto outcome. Function \Rfunction{pathdiagram2} can merge two-level \emph{pathdiagrams} into one nested \emph{pathdiagram} where inner \emph{pathdiagram} is a \emph{pathdiagram} of causal variables contributing to outcome and the outside \emph{pathdiagram} is a path diagram of causal variables including outcome onto the disease. The five datasets provide examples for running these functions. \Robject{lpd.data} and \Robject{cad.data} provide an example to create a standard beta dataset for path function to do path analysis and \emph{SNP} data for \emph{SNP} annotation analysis by performing \Rfunction{mktable} and \Rfunction{fmerge}. \Robject{beta.data} are a standard beta dataset for path analysis. \Robject{SNP358.data} provide an example for \Rfunction{snpPositAnnot} to do \emph{SNP} position annotation analysis and \Robject{SNP368annot.data} are for \Rfunction{ucscannot} to perform \emph{SNP} function annotation analysis.
+\Rpackage{GMRP} can perform analyses of Mendelian randomization (\emph{MR}),correlation, path of causal variables onto disease of study and \emph{SNP} annotation analysis. \emph{MR} includes \emph{SNP} selection with given criteria and regression analysis of causal variables on the disease to generate beta values of causal variables on the disease. Using the beta vectors, \Rpackage{GMRP} performs correlation and path analyses to construct  path diagrams of causal variables to the disease. \Rpackage{GMRP} consists of 8 \emph{R} functions: \Rfunction{chrp},\Rfunction{fmerge},\Rfunction{mktable},\Rfunction{pathdiagram},\Rfunction{pathdiagram2},\Rfunction{path},\Rfunction{snpPositAnnot},\Rfunction{ucscannot} and 5 datasets: \Robject{beta.data,cad.data,lpd.data,SNP358.data,SNP368annot.data}. \Rfunction{chrp} is used to separate string vector \texttt{hg19} into two numeric vectors: chromosome number and \emph{SNP} chromosome position. Function \Rfunction{fmerge} is used to merge two \emph{GWAS} result datasets into one dataset. Function \Rfunction{mktable} performs \emph{SNP} selection and creates a standard beta table for function \Rfunction{path} to do \emph{MR} and path analyses. Function \Rfunction{pathdiagram} is used to create a path diagram of causal variables onto a given disease or onto outcome. Function \Rfunction{pathdiagram2} can merge two-level \emph{pathdiagrams} into one nested \emph{pathdiagram} where inner \emph{pathdiagram} is a \emph{pathdiagram} of causal variables contributing to outcome and the outside \emph{pathdiagram} is a path diagram of causal variables including outcome onto the disease. The five datasets provide examples for running these functions. \Robject{lpd.data} and \Robject{cad.data} provide an example to create a standard beta dataset for path function to do path analysis and \emph{SNP} data for \emph{SNP} annotation analysis by performing \Rfunction{mktable} and \Rfunction{fmerge}. \Robject{beta.data} are a standard beta dataset for path analysis. \Robject{SNP358.data} provide an example for \Rfunction{snpPositAnnot} to do \emph{SNP} position annotation analysis and \Robject{SNP368annot.data} are for \Rfunction{ucscannot} to perform \emph{SNP} function annotation analysis.
 \end{abstract}
 
 \tableofcontents
@@ -27,9 +27,10 @@ BiocStyle::latex()
 \section{Introduction}
 As an example of human disease, coronary artery disease (\emph{CAD}) is one of the causes leading to death and infirmity worldwide~\cite{Murray1997}. Low-density lipoprotein cholesterol (\emph{LDL}) and triglycerides (\emph{TG}) are viewed as risk factors causing \emph{CAD}.  In epidemiological studies, plasma concentrations of increasing \emph{TG} and \emph{LDL} and deceasing high-density lipoprotein cholesterol (\emph{HDL} ) have been observed to be associated with risk for \emph{CAD}~\cite{Angelantonio2009, Sarwar2007}. However, from observational studies, one could not directly infer that these cholesterol concentrations  in plasma are risk factors causing \emph{CAD}~\cite{Do2013, Sarwar2007, Sheehan2007, Voight2012}. A big limitation of observational studies is to difficultly distinguish between causal and spurious associations due to confounding~\cite{Pichler2013}. An efficient approach to overcome this limitation is \textit{Mendelian Randomization} (\emph{MR}) analysis ~\cite{Sheehan2007, Smith2003} where genetic variants are used as instrumental variables. For this reason, many investigators tried to use genetic variants to assess causality and estimate the causal effects on the diseases.    
 
-\emph{MR} analysis can perfectly exclude confounding factors associated with disease.  However, when we expand one causal variable to many, \emph{MR} analysis becomes challenged and complicated because the genetic variant would have additional effects on the other risk factors, which violate assumption of no pleiotropy. An unknown genetic variant in \emph{MR} analysis possibly provides a false instrument for causal effect assessment of risk factors on the disease. The reason is that if this genetic variant is in \emph{LD} with another gene that is not used but has effect on the disease of study~\cite{Sheehan2007, Sheehan2010}. It then violates the third assumption.  These two problems can be addressed by using multiple instrumental variables.  For this reason, Do \emph{et al} (2013)developed statistic approach to address this issue~\cite{Do2013}. However, method of Do \emph{et al} ~\cite{Do2013} cannot disentangle correlation effects among the multiple undefined risk factors on the disease of study.  The beta values obtained from regression analyses are not direct causal effects because their effects are entangled with correlations among these undefined risk factors. 
+\emph{MR} analysis can perfectly exclude confounding factors associated with disease.  However, when we expand one causal variable to many, \emph{MR} analysis becomes challenged and complicated because the genetic variant would have additional effects on the other risk factors, which violate assumption of no pleiotropy. An unknown genetic variant in \emph{MR} analysis possibly provides a false instrument for causal effect assessment of risk factors on the disease. The reason is that
+if this genetic variant is in \emph{LD} with another gene that is not used but has effect on the disease of study~\cite{Sheehan2007, Sheehan2010}. It then violates the third assumption.  These two problems can be addressed by using multiple instrumental variables.  For this reason, Do \emph{et al}(2013)developed statistic approach to address this issue~\cite{Do2013}. However, the method of Do \emph{et al} ~\cite{Do2013} cannot disentangle correlation effects among the multiple undefined risk factors on the disease of study.  The beta values obtained from regression analyses are not direct causal effects because their effects are entangled with correlations among these undefined risk factors. 
 
-The best way to address the entanglement of multiple causal effects is path analysis that was developed by Wright~\cite{Wright1921, Wright1934}. This is because path analysis can dissect beta values into direct and indirect effects of causal variables on the disease. However, path analysis has not broadly been applied to diseases because diseases are usually binary variable. The method of Do ~\cite{Do2013} makes it possible to apply path analysis to disentangle causal effects of undefined risk factors on diseases. For doing so, we here provide \textbf {R package} \Rpackage{GMRP} (\emph{GWAS}-based \emph{MR} and \emph{path analysis}) to solve the above issues.
+The best way to address the entanglement of multiple causal effects is path analysis that was developed by Wright~\cite{Wright1921, Wright1934}. This is because path analysis can dissect beta values into direct and indirect effects of causal variables on the disease. However, path analysis has not broadly been applied to diseases because diseases are usually binary variable. The method of Do ~\cite{Do2013} makes it possible to apply path analysis to disentangle causal effects of undefined risk factors on diseases. For doing so, we here provide \textbf{R package} \Rpackage{GMRP} (\emph{GWAS}-based \emph{MR} and \emph{path analysis}) to solve the above issues.
 
 This vignette is intended to give a rapid introduction to the commands used in implementing \emph{MR} analysis, regression analysis, and path analysis, including \emph{SNP} annotation and chromosomal position analysis by means of the \Rpackage{GMRP} package. 
 
@@ -126,7 +127,7 @@ We use function \Rfunction{mktable} to choose \emph{SNP}s and make a standard be
  
 The standard beta table will be created via 15 steps:
 
-Step1: calculate $pvj$
+Step1: calculate $pv_j$
 
 <<Step1,keep.source=TRUE, eval=FALSE>>=
 pvalue.LDL <- lpd$P.value.LDL
@@ -155,7 +156,7 @@ a1.TC <- lpd$A1.TC
 alle1 <- cbind(a1.LDL, a1.HDL, a1.TG, a1.TC)
 @
 
-Step4: give sample sizes of causal variables and calculate $pcj$
+Step4: give sample sizes of causal variables and calculate $pc_j$
 <<Step4, keep.source=TRUE, eval=FALSE>>=
 N.LDL <- lpd$N.LDL
 N.HDL <- lpd$N.HDL
@@ -175,7 +176,7 @@ freq.TC<-lpd$Freq.A1.1000G.EUR.TC
 freq<-cbind(freq.LDL,freq.HDL,freq.TG,freq.TC)
 @
  
-Step6: construct matrix for $sd$ of each causal variable (here $sd$ is not specific to \emph{SNP} $j$). The following $sd$ values for \emph{LDL, HDL,TG} and \emph{TC} were means of standard deviations of these lipoprotein concentrations in plasma over 63 studies from Willer \emph{et al}~\cite{Willer2013}. 
+Step6: construct matrix for $sd$ of each causal variable (here $sd$ is not specific to $SNP_j$). The following $sd$ values for \emph{LDL, HDL,TG} and \emph{TC} were means of standard deviations of these lipoprotein concentrations in plasma over 63 studies from Willer \emph{et al}~\cite{Willer2013}. 
 <<Step6, keep.source=TRUE, eval=FALSE>>=
 sd.LDL <- rep(37.42, length(pvj))
 sd.HDL <- rep(14.87, length(pvj))
@@ -202,7 +203,7 @@ newdata<-cbind(chr,rsid,alle1,as.data.frame(newdata))
 dim(newdata)
 @
  
-Step10: retrieve data from \Robject{cad} and calculate $pdj$ and frequency of coronary artery disease: \textit{freq.case} in population:
+Step10: retrieve data from \Robject{cad} and calculate $pd_j$ and frequency of coronary artery disease: \textit{freq.case} in population:
 <<Step10,keep.source=TRUE, eval=FALSE>>=
 hg18.d <- cad$chr_pos_b36
 SNP.d <- cad$SNP #SNPID
