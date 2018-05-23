@@ -48,7 +48,7 @@ data12 <- fmerge(fl1=data1, fl2=data2, ID1="SNP", ID2="SNP", A=".dat1", B=".dat2
 ###################################################
 
 data(cad.data)
-#cad <- DataFrame(cad.data)
+cad <- DataFrame(cad.data)
 cad<-cad.data
 head(cad)
 
@@ -57,7 +57,7 @@ head(cad)
 ###################################################
 
 data(lpd.data)
-#lpd <- DataFrame(lpd.data)
+lpd <- DataFrame(lpd.data)
 lpd<-lpd.data
 head(lpd)
 

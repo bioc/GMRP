@@ -1,6 +1,7 @@
 fmerge <-
 function(fl1,fl2,ID1,ID2,A="",B="",method="No"){
-
+fl1<-DataFrame(fl1)
+fl2<-DataFrame(fl2)
 try (if(is.null(dim(fl1))|is.null(dim(fl2))) 
    stop("No data to be merged")
    )
@@ -35,5 +36,6 @@ merge.dat<-cbind(as.data.frame(fl1.new),as.data.frame(fl2.new))
 mergdata<-merge.dat[,-"SNPID2"]
 }
 mergdata<-merge.dat[,-1]
+mergdata<-DataFrame(mergdata)
 return(mergdata)
 }

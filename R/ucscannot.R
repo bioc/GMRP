@@ -1,6 +1,6 @@
 ucscannot <-
 function(UCSCannot,SNPn,A=3,B=1.9,C=1.3, method=1){
-UCSCannot<-as.data.frame(UCSCannot)	
+UCSCannot<-DataFrame(UCSCannot)	
 function_unit<-UCSCannot$function_unit
 if(is.null(function_unit)){
 stop("No function_unit found in the data")

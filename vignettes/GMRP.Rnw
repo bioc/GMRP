@@ -89,14 +89,14 @@ User can take the following approach to merge all four lipid files into a data s
   
 <<>>=
 data(cad.data)
-#cad <- DataFrame(cad.data)
+cad <- DataFrame(cad.data)
 cad<-cad.data
 head(cad)
 @
 
 <<>>=
 data(lpd.data)
-#lpd <- DataFrame(lpd.data)
+lpd <- DataFrame(lpd.data)
 lpd<-lpd.data
 head(lpd)
 @
