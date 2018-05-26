@@ -8,8 +8,8 @@ BiocStyle::latex()
 #library("knitr")
 #opts_chunk$set(tidy=FALSE,dev="pdf",fig.show="hide",
  #              fig.width=4,fig.height=4.5,
- #             dpi=300,# increase dpi to avoid pixelised pngs
- #             message=FALSE)
+  #             dpi=300,# increase dpi to avoid pixelised pngs
+  #             message=FALSE)
                
 ###################################################
 ### code chunk number 2: GMRP.Rnw:40-43
@@ -46,18 +46,15 @@ data12 <- fmerge(fl1=data1, fl2=data2, ID1="SNP", ID2="SNP", A=".dat1", B=".dat2
 ###################################################
 ### code chunk number 5: disease data load:90-93
 ###################################################
-
 data(cad.data)
-cad <- DataFrame(cad.data)
+#cad <- DataFrame(cad.data)
 cad<-cad.data
 head(cad)
-
 ###################################################
 ### code chunk number 6:lipid data load: 95-99
 ###################################################
-
 data(lpd.data)
-lpd <- DataFrame(lpd.data)
+#lpd <- DataFrame(lpd.data)
 lpd<-lpd.data
 head(lpd)
 
@@ -84,7 +81,7 @@ beta.LDL <- lpd$beta.LDL
 beta.HDL <- lpd$beta.HDL
 beta.TG <- lpd$beta.TG
 beta.TC <- lpd$beta.TC
-beta <- cbind(beta.LDL,beta.HDL,beta.TG,beta.TC)
+beta <- cbind(beta.LDL, beta.HDL, beta.TG, beta.TC)
 
 ###################################################
 #     Step3: construct a matrix for allele1: 148-154
@@ -94,7 +91,7 @@ a1.LDL <- lpd$A1.LDL
 a1.HDL <- lpd$A1.HDL
 a1.TG <- lpd$A1.TG
 a1.TC <- lpd$A1.TC
-alle1 <- cbind(a1.LDL,a1.HDL,a1.TG,a1.TC)
+alle1 <- cbind(a1.LDL, a1.HDL, a1.TG, a1.TC)
 
 ###################################################
 # Step4:  calculate pcj:157-165
@@ -104,7 +101,7 @@ N.LDL <- lpd$N.LDL
 N.HDL <- lpd$N.HDL
 N.TG <- lpd$N.TG
 N.TC <- lpd$N.TC
-ss <- cbind(N.LDL,N.HDL,N.TG,N.TC)
+ss <- cbind(N.LDL, N.HDL, N.TG, N.TC)
 sm <- apply(ss,1,sum)
 pcj <- round(sm/max(sm), 6)
 
@@ -131,15 +128,13 @@ sd <- cbind(sd.LDL, sd.HDL, sd.TG, sd.TC)
 ###################################################
 # Step7: SNPID and position: 186-189
 ###################################################
-
-#<<Step7, keep.source=TRUE, eval=FALSE>>=
+<<Step7, keep.source=TRUE, eval=FALSE>>=
 hg19 <- lpd$SNP_hg19.HDL
 rsid <- lpd$rsid.HDL
 
 ###################################################
 # Step8: separate chromosome number and SNP position: 192-194
 ###################################################
-
 chr<-chrp(hg=hg19)
 
 ###################################################
@@ -151,9 +146,9 @@ newdata<-cbind(chr,rsid,alle1,as.data.frame(newdata))
 dim(newdata)
 
 
-###########################################################
+###################################################
 # Step10: retrieve data from cad and calculate pdj:204-215
-###########################################################
+###################################################
 
 hg18.d <- cad$chr_pos_b36
 SNP.d <- cad$SNP #SNPID
@@ -166,23 +161,22 @@ N.ctr <- cad$N_control
 N.d <- N.case+N.ctr
 freq.case <- N.case/N.d
 
-###################################################################
+###################################################
  # Step11: combine these cad variables into new data sheet:218-222
- ##################################################################
+ ###################################################
 
 newcad <- cbind(freq.d, beta.d, N.case, N.ctr, freq.case)
 newcad <- cbind(hg18.d, SNP.d, a1.d, as.data.frame(newcad))
 dim(newcad)
 
-########################################################## 
+################################################### 
 #Step12: give name vector of causal variables: 225-227
-##########################################################
+###################################################
 varname <-c("CAD", "LDL", "HDL", "TG", "TC")
 
 ###################################################
 ### Step 13: choose SNPs and make beta table
 ###################################################
-
 mybeta <- mktable(cdata=newdata, ddata=newcad, rt="beta", 
 varname=varname, LG=1, Pv=0.00000005, Pc=0.979, Pd=0.979)
 dim(mybeta)
@@ -194,7 +188,6 @@ head(beta)
 ###################################################
 ### load beta data: 256-264
 ###################################################
-
 data(beta.data)
 beta.data<-DataFrame(beta.data)
 CAD <- beta.data$cad
@@ -206,7 +199,6 @@ TC <- beta.data$tc
 ###################################################
 ### two way scatter: 266-280
 ###################################################
-
 par(mfrow=c(2, 2), mar=c(5.1, 4.1, 4.1, 2.1), oma=c(0, 0, 0, 0))
 plot(LDL,CAD, pch=19, col="blue", xlab="beta of SNPs on LDL", 
 ylab="beta of SNP on CAD", cex.lab=1.5, cex.axis=1.5, cex.main=2)
@@ -224,7 +216,6 @@ abline(lm(CAD~TC), col="red", lwd=2)
 ###################################################
 ### MR and Path Analysis: 296-300
 ###################################################
-
 data(beta.data)
 mybeta <- DataFrame(beta.data)
 mod <- CAD~LDL+HDL+TG+TC
@@ -245,13 +236,11 @@ mypath
 ###################################################
 ### load package: diagram: 324-326
 ###################################################
-
 library(diagram)
 
 ###################################################
 # make path diagram
 ###################################################
-
 pathdiagram(pathdata=mypath, disease="CAD", R2=0.988243, range=c(1:3))
 
 pathD<-matrix(NA,4,5)
@@ -283,8 +272,8 @@ library(graphics)
 ###################################################
 # chromosome SNP position histogram
 ##########################################
-
 snpPositAnnot(SNPdata=SNP358,SNP_hg19="chr",main="A")
+
 
 ###################################################
 # SNP function annotation analysis
@@ -305,7 +294,6 @@ SNP368[1:10, ]
 ###################################################
 # make 3D Pie
 #############################################
-
 ucscannot(UCSCannot=SNP368,SNPn=368)
 
 ucscannot(UCSCannot=SNP368,SNPn=368,A=3,B=2,C=1.3,method=2)
