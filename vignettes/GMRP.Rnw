@@ -11,7 +11,6 @@
 <<style, echo=FALSE, results=tex>>=
 BiocStyle::latex(use.unsrturl=FALSE)
 @
-
 \title{GWAS-based Mendelian Randomization Path Analysis}
 \author{Yuan-De Tan \\
 \texttt{tanyuande@gmail.com}}
@@ -81,8 +80,8 @@ dim(data1)
 dim(data2)
 colnames(data1) <- c("SNP", "var1", "var2", "var3", "var4")
 colnames(data2) <- c("SNP", "var1", "var2", "var3", "var4", "V1", "V2", "V3")
-data1<-DataFrame(data1)
-data2<-DataFrame(data2)
+data1<-as.data.frame(data1)
+data2<-as.data.frame(data2)
 data12 <- fmerge(fl1=data1, fl2=data2, ID1="SNP", ID2="SNP", A=".dat1", B=".dat2", method="No")
 @
 
@@ -272,7 +271,7 @@ To roughly display relationship of the undefined causal variables to disease of 
 
 <<>>=
 data(beta.data)
-beta.data<-DataFrame(beta.data)
+beta.data<-as.data.frame(beta.data)
 CAD <- beta.data$cad
 LDL <- beta.data$ldl
 HDL <- beta.data$hdl
@@ -307,7 +306,7 @@ After \textbf{standard beta table} was successfully created by \Rfunction{mktabl
  
 <<path, keep.source=TRUE, eval=FALSE>>=
 data(beta.data)
-mybeta <- DataFrame(beta.data)
+mybeta <- as.data.frame(beta.data)
 mod <- CAD~LDL+HDL+TG+TC
 pathvalue <- path(betav=mybeta, model=mod, outcome="CAD")
 @

@@ -1,5 +1,5 @@
 mktable <-
-function(cdata,ddata,rt="beta",varname,LG=1,Pv=0.00000005,Pc=0.979,Pd=0.979){
+function(cdata,ddata,rt="beta",varname,LG=1,Pv=5e-08,Pc=0.979,Pd=0.979){
 
 try(
  if(is.null(cdata))

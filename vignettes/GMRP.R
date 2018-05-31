@@ -39,8 +39,8 @@ dim(data1)
 dim(data2)
 colnames(data1) <- c("SNP", "var1", "var2", "var3", "var4")
 colnames(data2) <- c("SNP", "var1", "var2", "var3", "var4", "V1", "V2", "V3")
-data1<-DataFrame(data1)
-data2<-DataFrame(data2)
+data1<-as.data.frame(data1)
+data2<-as.data.frame(data2)
 data12 <- fmerge(fl1=data1, fl2=data2, ID1="SNP", ID2="SNP", A=".dat1", B=".dat2", method="No")
 
 ###################################################
@@ -182,14 +182,14 @@ varname=varname, LG=1, Pv=0.00000005, Pc=0.979, Pd=0.979)
 dim(mybeta)
 beta <- mybeta[,4:8]   #  standard beta table for path analysis
 snp <- mybeta[,1:3]   #  snp data for annotation analysis
-beta<-DataFrame(beta)
+beta<-as.data.frame(beta)
 head(beta)
 
 ###################################################
 ### load beta data: 256-264
 ###################################################
 data(beta.data)
-beta.data<-DataFrame(beta.data)
+beta.data<-as.data.frame(beta.data)
 CAD <- beta.data$cad
 LDL <- beta.data$ldl
 HDL <- beta.data$hdl
@@ -217,7 +217,7 @@ abline(lm(CAD~TC), col="red", lwd=2)
 ### MR and Path Analysis: 296-300
 ###################################################
 data(beta.data)
-mybeta <- DataFrame(beta.data)
+mybeta <- as.data.frame(beta.data)
 mod <- CAD~LDL+HDL+TG+TC
 pathvalue <- path(betav=mybeta, model=mod, outcome="CAD")
 
@@ -260,7 +260,7 @@ disease="CAD", R2D=0.536535,R2O=0.988243)
 ###################################################
 
 data(SNP358.data)
-SNP358 <- DataFrame(SNP358.data)
+SNP358 <- as.data.frame(SNP358.data)
 head(SNP358)
 
 ###################################################
@@ -284,7 +284,7 @@ snpPositAnnot(SNPdata=SNP358,SNP_hg19="chr",main="A")
 ###################################################
 
 data(SNP368annot.data)
-SNP368<-DataFrame(SNP368annot.data)
+SNP368<-as.data.frame(SNP368annot.data)
 SNP368[1:10, ]
 
 ###################################################

@@ -42,7 +42,7 @@ This function just need  data of "Predicted function" and "symbol", so the other
 }
 \examples{
 data(SNP368annot.data)
-SNP368<-DataFrame(SNP368annot.data)
+SNP368<-as.data.frame(SNP368annot.data)
 ucscannot(UCSCannot=SNP368,SNPn=368,A=1.5,B=1,C=1.3)
 ucscannot(UCSCannot=SNP368,SNPn=368,A=1.5,B=1,C=1.3,method=2)
 }

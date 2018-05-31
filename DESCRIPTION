@@ -2,7 +2,7 @@ Package: GMRP
 Type: Package
 Title: GWAS-based Mendelian Randomization and Path Analyses
 Version: 1.8.1
-Date: 2018-05-23
+Date: 2018-05-31
 Author: Yuan-De Tan
 Maintainer: Yuan-De Tan <tanyuande@gmail.com>
 Description: Perform Mendelian randomization analysis of multiple SNPs
@@ -16,4 +16,4 @@ Suggests: BiocStyle, BiocGenerics, VariantAnnotation
 LazyLoad: yes
 biocViews: Sequencing, Regression, SNP
 NeedsCompilation: no
-PackageStatus: Deprecated
+VignetteBuilder: knitr
