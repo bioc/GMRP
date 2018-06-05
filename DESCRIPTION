@@ -16,4 +16,4 @@ Suggests: BiocStyle, BiocGenerics, VariantAnnotation
 LazyLoad: yes
 biocViews: Sequencing, Regression, SNP
 NeedsCompilation: no
-VignetteBuilder: knitr
+# VignetteBuilder: knitr
