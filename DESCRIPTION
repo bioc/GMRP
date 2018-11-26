@@ -1,7 +1,7 @@
 Package: GMRP
 Type: Package
 Title: GWAS-based Mendelian Randomization and Path Analyses
-Version: 1.11.0
+Version: 1.11.1
 Date: 2018-04-15
 Author: Yuan-De Tan
 Maintainer: Yuan-De Tan <tanyuande@gmail.com>
@@ -16,4 +16,3 @@ Suggests: BiocStyle, BiocGenerics
 LazyLoad: yes
 biocViews: Sequencing, Regression, SNP
 NeedsCompilation: no
-PackageStatus: Deprecated
