@@ -1,7 +1,7 @@
 Package: GMRP
 Type: Package
 Title: GWAS-based Mendelian Randomization and Path Analyses
-Version: 1.15.0
+Version: 1.16.0
 Date: 2018-04-15
 Author: Yuan-De Tan
 Maintainer: Yuan-De Tan <tanyuande@gmail.com>
